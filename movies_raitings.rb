@@ -14,7 +14,7 @@ def struct_movies(movies_list)
       genre: movie[5],
       duration: movie[6],
       rating: movie[7],
-      rating_stars: rating_star_format(movie[7].split('.')[1]),
+      rating_stars: rating_star_format(movie[7].split('.').last),
       director: movie[8],
       stars: movie[9]
     }
