@@ -1,3 +1,6 @@
+require 'mechanize'
+require 'awesome_print'
+
 movies_list_file = File.open('movies.txt').collect { |line| line.split('|') }
 
 
@@ -53,3 +56,33 @@ filtered.each { |movie|
   puts "Rating_stars:#{movie[:rating_stars]}"
   puts ""
 }
+
+
+def goto(url)
+  agent = Mechanize.new #{|a| a.log = Logger.new(STDERR) }
+  agent.user_agent_alias =  'Linux Mozilla'
+  agent.get(url)
+end
+
+
+def parsing(page)
+  films = []
+
+  parse = page.search('.chart .lister-list tr')
+  parse.each { |film|
+    film = {
+        :name => film.search('td.titleColumn a').text,
+        :year => film.search('td.titleColumn .secondaryInfo').text.gsub!(/[()]/, ""),
+        :rating => film.search('td.ratingColumn.imdbRating strong').text,
+    }
+    films << film
+  }
+
+  # posts.each { |post| puts post.to_json }
+  puts films
+  # puts "All: #{posts.count} post."
+end
+
+
+# page = goto('http://www.imdb.com/chart/top')
+# parsing(page)
