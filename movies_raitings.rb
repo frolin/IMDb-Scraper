@@ -1,9 +1,11 @@
+require 'awesome_print'
+
+require 'date'
+
 movies_list_file = File.open('movies.txt').collect { |line| line.split('|') }
 
 
 def struct_movies(movies_list)
-  movies = []
-
   movies_list.collect { |movie|
     {
       link: movie[0],
@@ -18,9 +20,7 @@ def struct_movies(movies_list)
       director: movie[8],
       stars: movie[9]
     }
-    movies << movie
   }
-movies
 end
 
 
@@ -42,13 +42,37 @@ filtered
 end
 
 
+def fifth_movie_max_length(movies_list)
+   movies_list.sort_by { |movie|
+      movie[:duration].to_i
+    }
+end
+
+def comedy_sort_by_date(movies_list)
+  movies_list.sort_by { |movie|
+    if movie[:genre].include?("Comedy")
+       movie[:year].to_i
+    end
+    }
+end
+
+def order_by_directors_uniq(movies_list)
+
+end
+
+def movie_captured_not_from_usa(movies_list)
+
+end
+
+
 movies_struct = struct_movies(movies_list_file)
+fifth_movie_max_length(movies_struct).last(5)
+comedy_sort_by_date(movies_struct)
+# filtered = filter(movies_struct)
 
-filtered = filter(movies_struct)
-
-filtered.each { |movie|
-  puts "name: #{movie[:name]}"
-  puts "Rating: #{movie[:rating]}"
-  puts "Rating_stars:#{movie[:rating_stars]}"
-  puts ""
-}
+# filtered.each { |movie|
+#   puts "name: #{movie[:name]}"
+#   puts "Rating: #{movie[:rating]}"
+#   puts "Rating_stars:#{movie[:rating_stars]}"
+#   puts ""
+# }
