@@ -1,7 +1,5 @@
 require 'awesome_print'
 
-require 'date'
-
 movies_list_file = File.open('movies.txt').collect { |line| line.split('|') }
 
 
@@ -29,7 +27,7 @@ def rating_star_format(value)
 end
 
 
-def filter(movies_list)
+def movies_filter_if_time(movies_list)
   filters = {time: 'Time'}
   filtered = []
 
@@ -42,37 +40,72 @@ filtered
 end
 
 
-def fifth_movie_max_length(movies_list)
+def movies_by_duration(movies_list)
    movies_list.sort_by { |movie|
       movie[:duration].to_i
     }
 end
 
-def comedy_sort_by_date(movies_list)
-  movies_list.sort_by { |movie|
+def comedies_by_date(movies_list)
+  comedys = []
+
+  movies_list.each{ |movie|
     if movie[:genre].include?("Comedy")
-       movie[:year].to_i
+      comedys << movie
     end
     }
+  comedys.sort_by!{|movie| movie[:date_published] }
 end
 
-def order_by_directors_uniq(movies_list)
+def all_movies_directors(movies_list)
+  movies_list.map { |movie| movie[:director] }.uniq.sort
+end
+
+def movies_produced_not_in_usa(movies_list)
+  movies_list.reject { |movie| movie[:county].include?("USA") }
+end
+
+
+def movies_group_by_directors(movies_list)
+  by_director = movies_list.group_by { |movie| movie[:director] }
+  by_director.map { |director, movie| {director => movie.count} }.sort_by!{ |movie| movie.values }
+end
+
+def actors_in_movies_count(movies_list)
+  actors_list = []
+
+  movies_list.each { |movie|
+    actors = movie[:stars].gsub(/\n/, "").split(',')
+    actors_list <<  actors
+  }
+
+  actors_list.flatten.reduce(Hash.new(0)) { |h, actor| h[actor] += 1; h }
 
 end
 
-def movie_captured_not_from_usa(movies_list)
 
+
+def lesson_2(list)
+  filtered = movies_filter_if_time(list)
+  filtered.each { |movie|
+    puts "name: #{movie[:name]}"
+    puts "Rating: #{movie[:rating]}"
+    puts "Rating_stars:#{movie[:rating_stars]}"
+    puts ""
+  }
 end
 
+
+def lesson_3(list)
+  movies_by_duration(list).last(5)
+  comedies_by_date(list)
+  all_movies_directors(list)
+  movies_produced_not_in_usa(list)
+  movies_group_by_directors(list)
+  actors_in_movies_count(list)
+end
 
 movies_struct = struct_movies(movies_list_file)
-fifth_movie_max_length(movies_struct).last(5)
-comedy_sort_by_date(movies_struct)
-# filtered = filter(movies_struct)
 
-# filtered.each { |movie|
-#   puts "name: #{movie[:name]}"
-#   puts "Rating: #{movie[:rating]}"
-#   puts "Rating_stars:#{movie[:rating_stars]}"
-#   puts ""
-# }
+lesson_2(movies_struct)
+lesson_3(movies_struct)
