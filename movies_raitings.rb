@@ -49,7 +49,7 @@ end
 def comedies_by_date(movies_list)
   comedys = []
 
-  movies_list.each{ |movie|
+  movies_list.each { |movie|
     if movie[:genre].include?("Comedy")
       comedys << movie
     end
@@ -78,9 +78,7 @@ def actors_in_movies_count(movies_list)
     actors = movie[:stars].gsub(/\n/, "").split(',')
     actors_list <<  actors
   }
-
   actors_list.flatten.reduce(Hash.new(0)) { |h, actor| h[actor] += 1; h }
-
 end
 
 
@@ -101,8 +99,10 @@ def lesson_3(list)
   comedies_by_date(list)
   all_movies_directors(list)
   movies_produced_not_in_usa(list)
-  movies_group_by_directors(list)
-  actors_in_movies_count(list)
+
+  #bonus
+    movies_group_by_directors(list)
+    actors_in_movies_count(list)
 end
 
 movies_struct = struct_movies(movies_list_file)
