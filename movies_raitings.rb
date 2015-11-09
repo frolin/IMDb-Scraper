@@ -34,7 +34,7 @@ end
 
 def movies_by_duration(movies_list)
   puts "Movies by duration last 5:"
-  movies_list.sort_by(&:duration)
+  movies_list.sort_by { |movie| movie[:duration].to_i }
 end
 
 def comedies_by_date(movies_list)
