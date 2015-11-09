@@ -1,9 +1,9 @@
+require 'awesome_print'
+
 movies_list_file = File.open('movies.txt').collect { |line| line.split('|') }
 
 
 def struct_movies(movies_list)
-  movies = []
-
   movies_list.collect { |movie|
     {
       link: movie[0],
@@ -18,9 +18,7 @@ def struct_movies(movies_list)
       director: movie[8],
       stars: movie[9]
     }
-    movies << movie
   }
-movies
 end
 
 
@@ -29,26 +27,71 @@ def rating_star_format(value)
 end
 
 
-def filter(movies_list)
-  filters = {time: 'Time'}
-  filtered = []
-
-  movies_list.each { |movie|
-    if movie[:name].include?(filters[:time])
-      filtered << movie
-    end
-  }
-filtered
+def movies_filter_if_time(movies_list)
+  movies_list.select { |movie| movie[:name].include?("Time") }
 end
 
 
+def movies_by_duration(movies_list)
+  puts "Movies by duration last 5:"
+  movies_list.sort_by { |movie| movie[:duration].to_i }
+end
+
+def comedies_by_date(movies_list)
+  puts "Comedies_by_date:"
+  movies_list.select { |movie| movie if movie[:genre].include?("Comedy") }.
+    sort_by { |movie| movie[:date_published] }
+end
+
+def all_movies_directors(movies_list)
+  puts "All_movies_directors:"
+  movies_list.collect { |movie| movie[:director] }.uniq.
+    sort_by { |director| director.split(" ").last }
+end
+
+def movies_produced_not_in_usa(movies_list)
+  puts "Movies_produced_not_in_usa:"
+  movies_list.reject { |movie| movie[:county].include?("USA") }
+end
+
+
+def movies_group_by_directors(movies_list)
+  puts "Movies_group_by_directors:"
+  movies_list.group_by { |movie| movie[:director] }.sort.
+    collect { |director, movies| {director => movies.count} }
+end
+
+def actors_in_movies_count(movies_list)
+  puts "Actors_in_movies_count:"
+  movies_list.collect { |movie| movie[:stars].strip.split(',') }.flatten.sort.
+    reduce(Hash.new(0)) { |h, actor| h[actor] += 1; h }
+end
+
+
+
+def lesson_2(list)
+  filtered = movies_filter_if_time(list)
+  filtered.each { |movie|
+    puts "name: #{movie[:name]}"
+    puts "Rating: #{movie[:rating]}"
+    puts "Rating_stars:#{movie[:rating_stars]}"
+    puts ""
+  }
+end
+
+
+def lesson_3(list)
+  ap movies_by_duration(list).last(5)
+  ap comedies_by_date(list)
+  ap all_movies_directors(list)
+  ap movies_produced_not_in_usa(list)
+
+  puts "#BONUS"
+  ap movies_group_by_directors(list)
+  ap actors_in_movies_count(list)
+end
+
 movies_struct = struct_movies(movies_list_file)
 
-filtered = filter(movies_struct)
-
-filtered.each { |movie|
-  puts "name: #{movie[:name]}"
-  puts "Rating: #{movie[:rating]}"
-  puts "Rating_stars:#{movie[:rating_stars]}"
-  puts ""
-}
+# lesson_2(movies_struct)
+lesson_3(movies_struct)
