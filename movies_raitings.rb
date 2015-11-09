@@ -28,7 +28,7 @@ end
 
 
 def movies_filter_if_time(movies_list)
-  movies_list.select { |movie| movie if movie[:name].include?("Time") }
+  movies_list.select { |movie| movie[:name].include?("Time") }
 end
 
 
@@ -40,13 +40,13 @@ end
 def comedies_by_date(movies_list)
   puts "Comedies_by_date:"
   movies_list.select { |movie| movie if movie[:genre].include?("Comedy") }.
-  sort_by { |movie| movie[:date_published] }
+    sort_by { |movie| movie[:date_published] }
 end
 
 def all_movies_directors(movies_list)
   puts "All_movies_directors:"
   movies_list.collect { |movie| movie[:director] }.uniq.
-  sort_by { |director| director.split(" ").last }
+    sort_by { |director| director.split(" ").last }
 end
 
 def movies_produced_not_in_usa(movies_list)
@@ -58,13 +58,13 @@ end
 def movies_group_by_directors(movies_list)
   puts "Movies_group_by_directors:"
   movies_list.group_by { |movie| movie[:director] }.sort.
-  collect { |director, movies| {director => movies.count} }
+    collect { |director, movies| {director => movies.count} }
 end
 
 def actors_in_movies_count(movies_list)
   puts "Actors_in_movies_count:"
   movies_list.collect { |movie| movie[:stars].strip.split(',') }.flatten.sort.
-  reduce(Hash.new(0)) { |h, actor| h[actor] += 1; h }
+    reduce(Hash.new(0)) { |h, actor| h[actor] += 1; h }
 end
 
 
