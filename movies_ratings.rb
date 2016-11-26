@@ -3,21 +3,33 @@ require 'csv'
 require 'ostruct'
 require 'date'
 
+
+movies_list_file = CSV.read('movies.txt', col_sep: '|', headers: true)
+
+def struct_movies(movies_list)
+  movies_list.collect { |movie|
+    OpenStruct.new (
+      {
+         link: movie[0],
+         name: movie[1],
+         year: movie[2],
+         county: movie[3],
+         date_published: movie[4],
+         genre: movie[5],
+         duration: movie[6],
+         rating: movie[7],
+         rating_stars: rating_star_format(movie[7].split('.').first),
+         director: movie[8],
+         stars: movie[9]
+      }
+   )
+  }
+end
+
 def rating_star_format(value)
   rating = value.split('.').first
   "*" * rating.to_i
 end
-
-
-movies_list_file = CSV.read('movies.txt', col_sep: '|', headers: true)
-
-movies_list_struct = movies_list_file.collect { |row|
-  movies_struct = OpenStruct.new(row.to_hash)
-  movies_struct[:rating_stars] = rating_star_format(movies_struct.rating)
-
-  movies_struct
-}
-
 
 def movies_filter_if_time(movies_list)
   movies_list.select { |movie| movie.name.include?("Time") }
@@ -32,12 +44,12 @@ end
 def comedies_by_date(movies_list)
   puts "Comedies_by_date:"
   movies_list.select { |movie| movie if movie.genre.include?("Comedy") }.
-      sort_by { |movie| movie.date_published }
+      sort_by(&:date_published)
 end
 
 def all_movies_directors(movies_list)
   puts "All_movies_directors:"
-  movies_list.collect { |movie| movie.director }.uniq.
+  movies_list.collect(&:director).uniq.
       sort_by { |director| director.split(" ").last }
 end
 
@@ -49,7 +61,7 @@ end
 
 def movies_group_by_directors(movies_list)
   puts "Movies_group_by_directors:"
-  movies_list.group_by { |movie| movie.director }.sort.
+  movies_list.group_by(&:director).sort.
       collect { |director, movies| {director => movies.count} }
 end
 
@@ -61,22 +73,10 @@ end
 
 def by_month(movies_list)
   movies_list.collect { |movies|
-    begin
-      Date.strptime(movies.date_published, '%Y-%m-%d')
-    rescue
-      # try to catch not full format of date
-      if movies.date_published.split('-').size == 2
-        Date.strptime(movies.date_published, '%Y-%m')
-      else
-        puts "Movie without month only year; #{movies.name} -  #{movies.date_published}}"
-        Date.strptime(movies.date_published, '%Y')
-      end
-    end
-  }.group_by { |d| d.strftime('%B') }.
+      Date.strptime(movies.date_published, '%Y-%m-%d').strftime('%B') rescue nil
+  }.compact.group_by(&:itself).
       reduce({}) { |h, (month,movies)| h[month] = movies.count; h }
 end
-
-
 
 
 def lesson_2(list)
@@ -108,6 +108,9 @@ def lesson_4(movies_struct)
   ap by_month(movies_struct)
 end
 
-# lesson_2(movies_list_struct)
-# lesson_3(movies_list_struct)
-lesson_4(movies_list_struct)
+movies = struct_movies(movies_list_file)
+
+lesson_2(movies)
+lesson_3(movies)
+
+lesson_4(movies)
