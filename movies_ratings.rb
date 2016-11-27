@@ -4,27 +4,15 @@ require 'ostruct'
 require 'date'
 
 
-movies_list_file = CSV.read('movies.txt', col_sep: '|', headers: true)
+csv_headers = ['link','name', 'year','country', 'date_published','genre', 'duration', 'rating', 'director', 'stars']
 
-def struct_movies(movies_list)
-  movies_list.collect { |movie|
-    OpenStruct.new (
-      {
-         link: movie[0],
-         name: movie[1],
-         year: movie[2],
-         county: movie[3],
-         date_published: movie[4],
-         genre: movie[5],
-         duration: movie[6],
-         rating: movie[7],
-         rating_stars: rating_star_format(movie[7].split('.').first),
-         director: movie[8],
-         stars: movie[9]
-      }
-   )
-  }
-end
+
+struct_movies = CSV.read('movies.txt', col_sep: '|', headers: csv_headers).collect { |row|
+  movies_struct = row.to_hash
+  movies_struct[:rating_stars] = rating_star_format(movies_struct['rating'])
+  OpenStruct.new(movies_struct)
+}
+
 
 def rating_star_format(value)
   rating = value.split('.').first
@@ -55,7 +43,7 @@ end
 
 def movies_produced_not_in_usa(movies_list)
   puts "Movies_produced_not_in_usa:"
-  movies_list.reject { |movie| movie.county.include?("USA") }
+  movies_list.reject { |movie| movie.country.include?("USA") }
 end
 
 
@@ -108,9 +96,7 @@ def lesson_4(movies_struct)
   ap by_month(movies_struct)
 end
 
-movies = struct_movies(movies_list_file)
+lesson_2(struct_movies)
+lesson_3(struct_movies)
 
-lesson_2(movies)
-lesson_3(movies)
-
-lesson_4(movies)
+lesson_4(struct_movies)
