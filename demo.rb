@@ -12,7 +12,7 @@ def lesson_5
   movies = MovieCollection.new('movies.txt')
   puts "method 'all' is: #{movies.all.class}"
 
-  # ap movies.sort_by(:year).first(5)
+  ap movies.sort_by(:year).first(5)
   ap movies.filter(:year, '1955')
   ap movies.stats(:director)
 
