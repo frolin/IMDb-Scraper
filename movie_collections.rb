@@ -1,6 +1,6 @@
 class MovieCollection
 
-  attr_reader :movies
+  attr_reader :movies, :genres
 
   CSV_HEADERS = ['link','name', 'year','country', 'date_published','genre', 'duration', 'rating', 'director', 'actors']
 
@@ -11,13 +11,20 @@ class MovieCollection
 
   def movies_list(csv_headers, file_name)
     CSV.read(file_name, col_sep: '|', headers: csv_headers).collect { |row|
-      Movie.new(row.to_hash)
+      Movie.new(row.to_hash, self)
     }
   end
 
   def all
     @movies.to_a
   end
+
+  def genres
+    all.collect {|movie| movie.genre }.flatten
+  end
+
+
+
 
   def sort_by(field)
     begin
@@ -28,49 +35,26 @@ class MovieCollection
   end
 
 
-  def filter(options = {})
+  def filter(options)
     options.collect { |field, value|
-      case value
-        when Regexp
-          @movies.select { |movie|
-            if movie.send(field).to_s.match(value)
-              movie
-            end
-          }
-        when Range
-          @movies.select { |movie|
-            movie if value.include?(movie.send(field).to_i)
-          }
-        when String
-          @movies.select { |movie|
-            if movie.send(field) == value || movie.send(field).include?(value)
-              movie
-            end
-          }
-      end.sort_by(&field)
+
+      @movies.select { |movie|
+        if movie.send(field).is_a?(Array)
+          movie.send(field).select { |arr| value === arr }.any?
+        else
+          value === movie.send(field)
+        end
+      }
+
     }
   end
 
   def stats(field)
-    case field
-      when :director
-        @movies.group_by {|movie| movie.send(field) }.
-            reduce({}) { |h, (f,v)| h[f] = v.count; h}
-
-      when :actors, :genre
-        @movies.collect {|movie| movie.send(field) }.flatten.
-            inject(Hash.new(0)){|h,arr| h[arr] +=1 ;h}
-
-      when :month
-        @movies.collect {|movie| movie.send(:month) }.compact.
-            reduce(Hash.new(0)) { |h, (f,v)| h[f] +=1; h}
-
-      else
-        @movies.group_by {|movie| movie.send(field) }.
-            reduce({}) { |h, (f,v)| h[f] = v.count; h}
-
-    end.sort_by(&:last).to_h
-
+    @movies.collect { | movie |
+      movie.send(field)}.flatten.compact.
+        reduce(Hash.new(0)){|h, field| h[field] +=1 ;h}.sort_by(&:last).to_h
   end
+
+
 
 end
