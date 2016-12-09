@@ -51,6 +51,7 @@ end
 def has_genres(movies)
   begin
     movies.all.first.has_genre?('Crime')
+    movies.all.first.has_genre?('Action')
     movies.all.first.has_genre?('SM')
   rescue => e
     puts e.message

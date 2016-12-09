@@ -20,7 +20,7 @@ class MovieCollection
   end
 
   def genres
-    all.collect {|movie| movie.genre }.flatten
+    @genres ||= all.collect(&:genre).flatten.uniq
   end
 
 
