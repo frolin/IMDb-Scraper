@@ -33,6 +33,7 @@ def stats(movies)
   ap movies.stats(:actors)
   ap movies.stats(:date_published_month)
   ap movies.stats(:director)
+  ap movies.stats(:year)
 end
 
 def sorting(movies)
@@ -42,17 +43,18 @@ end
 
 
 def filtered(movies)
-  movies.filter(genre: 'Crime').first(5)
-  ap movies.filter(genre: /My/).first(5)
-  ap movies.filter(year: 1992..2000).first(5)
+  ap movies.filter(genre: 'Crime')
+  ap movies.filter(year: '2003')
+  ap movies.filter(year: 2015).first(5)
+  ap movies.filter(year: 2007..2010,genre: 'Crime')
 end
 
 
 def has_genres(movies)
   begin
-    movies.all.first.has_genre?('Crime')
-    movies.all.first.has_genre?('Action')
-    movies.all.first.has_genre?('SM')
+    ap movies.all.first.has_genre?('Crime')
+    ap movies.all.first.has_genre?('Action')
+    ap movies.all.first.has_genre?('SM')
   rescue => e
     puts e.message
   end

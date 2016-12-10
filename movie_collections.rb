@@ -25,7 +25,6 @@ class MovieCollection
 
 
 
-
   def sort_by(field)
     begin
       @movies.sort_by(&field)
@@ -36,15 +35,15 @@ class MovieCollection
 
 
   def filter(options)
-    options.collect { |field, value|
+    options.reduce(@movies) { |m, (field, value)|
 
-      @movies.select { |movie|
+      m.select { |movie|
         if movie.send(field).is_a?(Array)
           movie.send(field).select { |arr| value === arr }.any?
         else
           value === movie.send(field)
         end
-      }
+      }.sort_by(&field)
 
     }
   end

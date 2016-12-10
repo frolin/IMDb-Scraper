@@ -5,6 +5,7 @@ class Movie
     movie.each { |k, v|
       instance_variable_set("@#{k}", v)
     }
+    @year = @year.to_i
     @genre = @genre.split(',')
     @actors = @actors.split(',')
     @rating_stars = rating_star_format(@rating)
